@@ -1,0 +1,1 @@
+Release: https://github.com/StaMa-StateMachine/StaMa/releases/tag/v2.3.1

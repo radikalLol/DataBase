@@ -1,0 +1,14 @@
+C:\Users\user\Desktop\Автоматы\DataBase 2.3\WindowsFormsApplication10\bin\Debug\WindowsFormsApplication10.exe.config
+C:\Users\user\Desktop\Автоматы\DataBase 2.3\WindowsFormsApplication10\obj\Debug\WindowsFormsApplication10.exe
+C:\Users\user\Desktop\Автоматы\DataBase 2.3\WindowsFormsApplication10\obj\Debug\WindowsFormsApplication10.pdb
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\bin\Debug\WindowsFormsApplication10.exe.config
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\obj\Debug\WindowsFormsApplication10.exe
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\obj\Debug\WindowsFormsApplication10.pdb
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\bin\Debug\WindowsFormsApplication10.exe
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\bin\Debug\WindowsFormsApplication10.pdb
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\bin\Debug\MetroFramework.dll
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\bin\Debug\MetroFramework.Fonts.dll
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\obj\Debug\BaseData version 2.3.csprojResolveAssemblyReference.cache
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\obj\Debug\WindowsFormsApplication10.Form1.resources
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\obj\Debug\WindowsFormsApplication10.Properties.Resources.resources
+C:\Users\User\Desktop\автоматы\DataBase 2.3\DataBase 2.3\WindowsFormsApplication10\obj\Debug\BaseData version 2.3.csproj.GenerateResource.Cache

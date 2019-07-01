@@ -1,0 +1,2419 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>StaMa</name>
+    </assembly>
+    <members>
+        <member name="T:StaMa.NamespaceDoc">
+            <summary>
+            <para>
+            Contains all classes, interfaces and delegate types to implement state machines.
+            </para>
+            <para>
+            See class <see cref="T:StaMa.StateMachineTemplate"/> to create the structure of a state machine.
+            </para>
+            <para>
+            Use method <see cref="M:StaMa.StateMachineTemplate.CreateStateMachine"/> or <see cref="M:StaMa.StateMachineTemplate.CreateStateMachine(System.Object)"/> to create StateMachine instances.
+            </para>
+            <para>
+            Send events to a state machine to trigger transitions through method <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/> or <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object,System.EventArgs)"/>.
+            </para>
+            </summary>
+        </member>
+        <member name="T:StaMa.IStateConfigurationVisitor">
+            <summary>
+            Defines a set of methods which allow for composing a human readable representation of a <see cref="T:StaMa.StateConfiguration"/>.
+            </summary>
+            <remarks>
+            <para>
+            The members of this interface are successively called when passing the interface to the
+            <see cref="T:StaMa.StateConfiguration"/>.<see cref="M:StaMa.StateConfiguration.PassThrough(StaMa.IStateConfigurationVisitor)"/> method.
+            </para>
+            <para>
+            An implementation of this interface creates the result of the <see cref="M:StaMa.StateConfiguration.ToString"/> method.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:StaMa.IStateConfigurationVisitor.State(StaMa.State)">
+            <summary>
+            Will be called for every well-defined state of a <see cref="T:StaMa.StateConfiguration"/>.
+            </summary>
+            <param name="state">
+            The <see cref="T:StaMa.State"/> instance that is visited.
+            </param>
+        </member>
+        <member name="M:StaMa.IStateConfigurationVisitor.StateAny">
+            <summary>
+            Will be called when the active state in a <see cref="T:StaMa.StateConfiguration"/> is not specified for a particular <see cref="T:StaMa.Region"/>.
+            </summary>
+        </member>
+        <member name="M:StaMa.IStateConfigurationVisitor.BeginSubStates">
+            <summary>
+            Will be called before enumerating the active states of the sub-regions of a composite state.
+            </summary>
+        </member>
+        <member name="M:StaMa.IStateConfigurationVisitor.EndSubStates">
+            <summary>
+            Will be called after the active states of the sub-regions of a composite state were enumerated.
+            </summary>
+        </member>
+        <member name="M:StaMa.IStateConfigurationVisitor.NextSubState">
+            <summary>
+            Will be called after enumerating the active state of the sub-region of a composite state.
+            </summary>
+            <remarks>
+            This method will not be called for the last sub-region of a composite state.
+            </remarks>
+        </member>
+        <member name="T:StaMa.IStateMachineTemplateVisitor">
+            <summary>
+            Defines the visitor interface to be used for passing through the
+            regions, states and transitions of a <see cref="T:StaMa.StateMachineTemplate"/>.
+            </summary>
+            <remarks>
+            This interface has to be implemented by a client object if the
+            <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see> method is used for
+            traversing through the <see cref="T:StaMa.Region"/>, <see cref="T:StaMa.State"/> and
+            <see cref="T:StaMa.Transition"/> nodes of a
+            <see cref="T:StaMa.StateMachineTemplate"/> object.
+            The client object's methods <see cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region()</see>,
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion()</see>,
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State()</see>, 
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState()</see> and
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">Transition()</see> will be
+            called subsequently during traversal of the node tree.
+            </remarks>
+            <seealso cref="T:StaMa.Region"/>
+            <seealso cref="T:StaMa.State"/>
+            <seealso cref="T:StaMa.Transition"/>
+        </member>
+        <member name="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">
+            <summary>
+            This method will be called when a <see cref="T:StaMa.Region"/> object is
+            encountered while traversing a <see cref="T:StaMa.StateMachineTemplate"/> with
+            the <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see> method.
+            </summary>
+            <remarks>
+            This method will be called before traversing the sub-objects of
+            the <see cref="T:StaMa.Region"/>. Balanced with this method call there
+            will be a <see cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion()</see> method
+            call after traversing the sub-objects of the <see cref="T:StaMa.Region"/>.
+            Between the <see cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region()</see> and
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion()</see> method calls there
+            may be <see cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State()</see>,
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState()</see> method calls for
+            the sub-objects of the <see cref="T:StaMa.Region"/>.
+            </remarks>
+            <example>
+            See <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see>.
+            </example>
+            <param name="region">
+            The <see cref="T:StaMa.Region"/> object that is encountered.
+            </param>
+            <returns>
+            <see cref="T:System.Boolean">true</see> if traversal shall continue; 
+            <see cref="T:System.Boolean">false</see> to stop traversal.
+            </returns>
+            <seealso cref="T:StaMa.Region">Region Class</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">Transition() Method</seealso>
+        </member>
+        <member name="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">
+            <summary>
+            This method will be called after a <see cref="T:StaMa.Region"/> object was
+            encountered while traversing a <see cref="T:StaMa.StateMachineTemplate"/> with
+            the <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see> method.
+            </summary>
+            <remarks>
+            This method will be called after traversing the sub-objects of
+            the <see cref="T:StaMa.Region"/>. Balanced with this method call there
+            was a <see cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region()</see> method
+            call before traversing the sub-objects of the <see cref="T:StaMa.Region"/>.
+            </remarks>
+            <example>
+            See <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see>.
+            </example>
+            <param name="region">
+            The <see cref="T:StaMa.Region"/> object that was encountered.
+            </param>
+            <returns>
+            <see cref="T:System.Boolean">true</see> if traversal shall continue; 
+            <see cref="T:System.Boolean">false</see> to stop traversal.
+            </returns>
+            <seealso cref="T:StaMa.Region">Region Class</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">Transition() Method</seealso>
+        </member>
+        <member name="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">
+            <summary>
+            This method will be called when a <see cref="T:StaMa.State"/> object is
+            encountered while traversing a <see cref="T:StaMa.StateMachineTemplate"/> with
+            the <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see> method.
+            </summary>
+            <remarks>
+            This method will be called before traversing the sub-objects of
+            the <see cref="T:StaMa.State"/>. Balanced with this method call there
+            will be a <see cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState()</see> method
+            call after traversing the sub-objects of the <see cref="T:StaMa.State"/>.
+            Between the <see cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State()</see> and
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState()</see> method calls there
+            may be <see cref="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">Transition()</see>, 
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region()</see> and
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion()</see>  method calls for
+            the sub-objects of the <see cref="T:StaMa.State"/>.
+            </remarks>
+            <example>
+            See <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see>.
+            </example>
+            <param name="state">
+            The <see cref="T:StaMa.State"/> object that is encountered.
+            </param>
+            <returns>
+            <see cref="T:System.Boolean">true</see> if traversal shall continue; 
+            <see cref="T:System.Boolean">false</see> to stop traversal.
+            </returns>
+            <seealso cref="T:StaMa.State">State Class</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">Transition() Method</seealso>
+        </member>
+        <member name="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">
+            <summary>
+            This method will be called after a <see cref="T:StaMa.State"/> object was
+            encountered while traversing a <see cref="T:StaMa.StateMachineTemplate"/> with
+            the <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see> method.
+            </summary>
+            <remarks>
+            This method will be called after traversing the sub-objects of
+            the <see cref="T:StaMa.State"/>. Balanced with this method call there
+            was a <see cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State()</see> method
+            call before traversing the sub-objects of the <see cref="T:StaMa.State"/>.
+            </remarks>
+            <example>
+            See <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see>.
+            </example>
+            <param name="state">
+            The <see cref="T:StaMa.State"/> object that was encountered.
+            </param>
+            <returns>
+            <see cref="T:System.Boolean">true</see> if traversal shall continue; 
+            <see cref="T:System.Boolean">false</see> to stop traversal.
+            </returns>
+            <seealso cref="T:StaMa.State">State Class</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">Transition() Method</seealso>
+        </member>
+        <member name="M:StaMa.IStateMachineTemplateVisitor.Transition(StaMa.Transition)">
+            <summary>
+            This method will be called when a <see cref="T:StaMa.Transition"/> object is
+            encountered while traversing a <see cref="T:StaMa.StateMachineTemplate">StateMachineTemplate</see> with
+            the <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see> method.
+            </summary>
+            <remarks>
+            Because there are no sub-objects in a <see cref="T:StaMa.Transition"/>, there
+            is only a single method call, as opposed to the
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region()</see> and
+            <see cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State()</see> methods, which are
+            always called paired with a <see cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion()</see>
+            and <see cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState()</see> call.
+            </remarks>
+            <example>
+            See <see cref="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">PassThrough()</see>.
+            </example>
+            <param name="transition">
+            The <see cref="T:StaMa.Transition"/> object that is encountered.
+            </param>
+            <returns>
+            <see cref="T:System.Boolean">true</see> if traversal shall continue; 
+            <see cref="T:System.Boolean">false</see> to stop traversal.
+            </returns>
+            <seealso cref="T:StaMa.Transition">Transition Class</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.Region(StaMa.Region)">Region() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndRegion(StaMa.Region)">EndRegion() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.State(StaMa.State)">State() Method</seealso>
+            <seealso cref="M:StaMa.IStateMachineTemplateVisitor.EndState(StaMa.State)">EndState() Method</seealso>
+        </member>
+        <member name="T:StaMa.Region">
+            <summary>
+            Represents a container for states and defines the initial <see cref="T:StaMa.State"/> for the contained states.
+            </summary>
+            <remarks>
+            Instances of this class will be created through the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> method.
+            </remarks>
+        </member>
+        <member name="M:StaMa.Region.#ctor(StaMa.State,System.String,System.Int32,StaMa.StateMachineTemplate)">
+            <summary>
+            Initializes a new <see cref="T:StaMa.Region"/> instance. 
+            </summary>
+            <param name="parentState">
+            The <see cref="T:StaMa.State"/> instance that contains this <see cref="T:StaMa.Region"/>. Shall be <c>null</c> for the root <see cref="T:StaMa.Region"/> instance.
+            </param>
+            <param name="initialStateName">
+            The name of the initial <see cref="T:StaMa.State"/> of the <see cref="T:StaMa.Region"/>.
+            </param>
+            <param name="historyIndex">
+            If the <see cref="T:StaMa.Region"/> shall have a history, the index of the slot where
+            this <see cref="T:StaMa.Region"/> stores its history in the <see cref="T:StaMa.StateMachine"/> instance.
+            If the region has no history, <see cref="F:System.Int32.MaxValue">int.MaxValue</see>.
+            </param>
+            <param name="stateMachineTemplate">
+            The embedding <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            Internally used for creating the <see cref="P:StaMa.Region.States"/> collection.
+            </param>
+            <remarks>
+            Instances of this class will be created through the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> method.
+            </remarks>
+        </member>
+        <member name="M:StaMa.Region.ToString">
+            <summary>
+            Returns the execution order of the <see cref="T:StaMa.Region"/>.
+            </summary>
+            <returns>
+            Returns the <see cref="P:StaMa.Region.ExecutionOrder"/> value formatted as a <see cref="T:System.String"/>.
+            </returns>
+        </member>
+        <member name="P:StaMa.Region.Parent">
+            <summary>
+            Gets the <see cref="T:StaMa.State"/> that aggregates this <see cref="T:StaMa.Region"/>.
+            </summary>
+        </member>
+        <member name="P:StaMa.Region.States">
+            <summary>
+            Gets the list of <see cref="T:StaMa.State"/>s of this <see cref="T:StaMa.Region"/>.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateCollection"/> instance. At least one item (namely the
+            <see cref="P:StaMa.Region.InitialState"/>) will be present in this collection.
+            </value>
+        </member>
+        <member name="P:StaMa.Region.ExecutionOrder">
+            <summary>
+            The sequential index of this <see cref="T:StaMa.Region"/> within
+            the <see cref="P:StaMa.State.Regions"/> collection of the parent <see cref="T:StaMa.State"/>.
+            </summary>
+            <value>
+            A <see cref="T:System.Int32"/> greater or equal 1.
+            </value>
+        </member>
+        <member name="P:StaMa.Region.InitialState">
+            <summary>
+            The <see cref="T:StaMa.State"/> that will be made active when the <see cref="T:StaMa.Region"/> is entered
+            the first time.
+            </summary>
+        </member>
+        <member name="P:StaMa.Region.StateConfigurationIndex">
+            <summary>
+            The slot within a <see cref="T:StaMa.StateConfiguration"/> that will be used by
+            the active state of this <see cref="T:StaMa.Region"/>.
+            </summary>
+        </member>
+        <member name="P:StaMa.Region.HasHistory">
+            <summary>
+            Indicates whether the recently active <see cref="T:StaMa.State"/> will be made
+            active on rentry of the <see cref="T:StaMa.Region"/>.
+            </summary>
+            <value>
+            <c>true</c> if the recently active <see cref="T:StaMa.State"/> will be made
+            active on rentry; <c>false</c> if the <see cref="P:StaMa.Region.InitialState"/> will be made active.
+            </value>
+        </member>
+        <member name="P:StaMa.Region.HistoryIndex">
+            <summary>
+            Gets the index of the slot where this <see cref="T:StaMa.Region"/> stores its
+            history in the <see cref="T:StaMa.StateMachine"/> instance.
+            </summary>
+            <value>
+            A <see cref="T:System.UInt32"/> if the <see cref="T:StaMa.Region"/> has a history; otherwise, <see cref="F:System.UInt32.MaxValue">uint.MaxValue</see>.
+            </value>
+        </member>
+        <member name="T:StaMa.StateCollection">
+            <summary>
+            Represents a list of <see cref="T:StaMa.State"/> instances.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateCollection.#ctor">
+            <summary>
+            Initializes a new <see cref="T:StaMa.StateCollection"/> instance.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateCollection.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the <see cref="T:StaMa.StateCollection"/>. 
+            </summary>
+            <returns>
+            A <see cref="T:System.Collections.IEnumerator"/> for the <see cref="T:StaMa.StateCollection"/>.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateCollection.Contains(StaMa.State)">
+            <summary>
+            Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateCollection.CopyTo(StaMa.State[],System.Int32)">
+            <summary>
+            Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateCollection.Item(System.String)">
+            <summary>
+            Gets the <see cref="T:StaMa.State"/> with a specific name within the <see cref="T:StaMa.Region"/>.
+            </summary>
+            <param name="stateName">
+            The name of the <see cref="T:StaMa.State"/>.
+            </param>
+            <returns>
+            The <see cref="T:StaMa.State"/> with the specified name, or <c>null</c> if there is no such <see cref="T:StaMa.State"/>.
+            </returns>
+        </member>
+        <member name="P:StaMa.StateCollection.Item(System.Int32)">
+            <summary>
+            Gets the <see cref="T:StaMa.State"/> at the specified index.
+            </summary>
+            <param name="index">
+            The zero-based index of the <see cref="T:StaMa.State"/> to get.
+            </param>
+            <returns>
+            The <see cref="T:StaMa.State"/> at the index.
+            </returns>
+        </member>
+        <member name="P:StaMa.StateCollection.Count">
+            <summary>
+            Gets the number of elements contained in the <see cref="T:StaMa.StateCollection"/>. 
+            </summary>
+        </member>
+        <member name="P:StaMa.StateCollection.IsReadOnly">
+            <summary>
+            Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+            </summary>
+        </member>
+        <member name="T:StaMa.State">
+            <summary>
+            Represents a state with entry and exit actions. Hierarchical sub-states are aggregated through the <see cref="P:StaMa.State.Regions"/> collection.
+            </summary>
+            <remarks>
+            Instances of this class will be created through the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> methods.
+            </remarks>
+        </member>
+        <member name="M:StaMa.State.#ctor(StaMa.Region,System.String,StaMa.StateMachineActionCallback,StaMa.StateMachineActionCallback,StaMa.StateMachineDoActionCallback,StaMa.StateMachineTemplate)">
+            <summary>
+            Initializes a new <see cref="T:StaMa.State"/> instance.
+            </summary>
+            <param name="parentRegion">
+            </param>
+            <param name="name">
+            The name of the <see cref="T:StaMa.State"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="entryAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            enters the the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no entry action is specified.
+            </param>
+            <param name="exitAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            leaves the the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no exit action is specified.
+            </param>
+            <param name="doAction">
+            The <see cref="T:StaMa.StateMachineDoActionCallback"/> delegate that defines the perpetual action to be executed while the <see cref="T:StaMa.StateMachine"/> is in this <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no do action is specified.
+            </param>
+            <param name="stateMachineTemplate">
+            The embedding <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            Internally used for creating the <see cref="P:StaMa.State.Transitions"/> and <see cref="P:StaMa.State.Regions"/> collections.
+            </param>
+            <remarks>
+            Instances of this class will be created through the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> methods.
+            </remarks>
+        </member>
+        <member name="M:StaMa.State.ToString">
+            <summary>
+            Returns the name of the <see cref="T:StaMa.State"/> as specified in the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> statement.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> containing the value of the <see cref="P:StaMa.State.Name"/> property of the <see cref="T:StaMa.State"/>.
+            </returns>
+        </member>
+        <member name="P:StaMa.State.Parent">
+            <summary>
+            Gets the <see cref="T:StaMa.Region"/> that aggregates this <see cref="T:StaMa.State"/>.
+            </summary>
+        </member>
+        <member name="P:StaMa.State.Regions">
+            <summary>
+            Gets the list of sub-<see cref="T:StaMa.Region"/> instances.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.RegionCollection"/> instance. The <see cref="P:StaMa.RegionCollection.Count"/> property
+            will be <c>0</c> if there are no sub-<see cref="T:StaMa.Region"/> instances.
+            </value>
+        </member>
+        <member name="P:StaMa.State.Transitions">
+            <summary>
+            Gets the list of <see cref="T:StaMa.Transition"/> instances that use this <see cref="T:StaMa.State"/> as an anchor.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.TransitionCollection"/> instance. The <see cref="P:StaMa.TransitionCollection.Count"/> property
+            will be 0 if there are no <see cref="T:StaMa.Transition"/> instances.
+            </value>
+        </member>
+        <member name="P:StaMa.State.Name">
+            <summary>
+            Gets name of the <see cref="T:StaMa.State"/>.
+            </summary>
+            <value>
+            An identifier which is unique within the embedding <see cref="T:StaMa.StateMachineTemplate"/>.
+            </value>
+        </member>
+        <member name="P:StaMa.State.EntryAction">
+            <summary>
+            Gets the callback that will be called when a <see cref="T:StaMa.StateMachine"/> enters
+            the <see cref="T:StaMa.State"/>.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate or <c>null</c> if
+            no entry action is defined.
+            </value>
+        </member>
+        <member name="P:StaMa.State.ExitAction">
+            <summary>
+            Gets the callback that will be called when a <see cref="T:StaMa.StateMachine"/> leaves
+            the <see cref="T:StaMa.State"/>.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate or <c>null</c> if
+            no exit action is defined.
+            </value>
+        </member>
+        <member name="P:StaMa.State.DoAction">
+            <summary>
+            Gets the <see cref="T:StaMa.StateMachineDoActionCallback"/> delegate that defines the perpetual action to be executed while the <see cref="T:StaMa.StateMachine"/> is in this <see cref="T:StaMa.State"/>.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateMachineDoActionCallback"/> delegate or <c>null</c> if no do action is defined.
+            </value>
+            <remarks>
+            This callback will be executed from within <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object,System.EventArgs)"/> or <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            after every individual state change or one time in case no state change occurred in the invocation.
+            </remarks>
+        </member>
+        <member name="T:StaMa.RegionCollection">
+            <summary>
+            Represents a list of <see cref="T:StaMa.Region"/> instances.
+            </summary>
+        </member>
+        <member name="M:StaMa.RegionCollection.#ctor">
+            <summary>
+            Initializes a new <see cref="T:StaMa.RegionCollection"/> instance.
+            </summary>
+        </member>
+        <member name="M:StaMa.RegionCollection.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the <see cref="T:StaMa.RegionCollection"/>. 
+            </summary>
+            <returns>
+            A <see cref="T:System.Collections.IEnumerator"/> for the <see cref="T:StaMa.RegionCollection"/>.
+            </returns>
+        </member>
+        <member name="M:StaMa.RegionCollection.Contains(StaMa.Region)">
+            <summary>
+            Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+            </summary>
+        </member>
+        <member name="M:StaMa.RegionCollection.CopyTo(StaMa.Region[],System.Int32)">
+            <summary>
+            Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+            </summary>
+        </member>
+        <member name="P:StaMa.RegionCollection.Item(System.Int32)">
+            <summary>
+            Gets the <see cref="T:StaMa.Region"/> at the specified index.
+            </summary>
+            <param name="index">
+            The zero-based index of the <see cref="T:StaMa.Region"/> to get.
+            </param>
+            <returns>
+            The <see cref="T:StaMa.Region"/> at the index.
+            </returns>
+        </member>
+        <member name="P:StaMa.RegionCollection.Count">
+            <summary>
+            Gets the number of elements contained in the <see cref="T:StaMa.RegionCollection"/>. 
+            </summary>
+        </member>
+        <member name="P:StaMa.RegionCollection.IsReadOnly">
+            <summary>
+            Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+            </summary>
+        </member>
+        <member name="T:StaMa.TransitionCollection">
+            <summary>
+            Represents a list of <see cref="T:StaMa.Transition"/> instances.
+            </summary>
+        </member>
+        <member name="M:StaMa.TransitionCollection.#ctor">
+            <summary>
+            Initializes a new <see cref="T:StaMa.TransitionCollection"/> instance.
+            </summary>
+        </member>
+        <member name="M:StaMa.TransitionCollection.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the <see cref="T:StaMa.TransitionCollection"/>. 
+            </summary>
+            <returns>
+            A <see cref="T:System.Collections.IEnumerator"/> for the <see cref="T:StaMa.TransitionCollection"/>.
+            </returns>
+        </member>
+        <member name="M:StaMa.TransitionCollection.Contains(StaMa.Transition)">
+            <summary>
+            Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+            </summary>
+        </member>
+        <member name="M:StaMa.TransitionCollection.CopyTo(StaMa.Transition[],System.Int32)">
+            <summary>
+            Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+            </summary>
+        </member>
+        <member name="P:StaMa.TransitionCollection.Item(System.Int32)">
+            <summary>
+            Gets the <see cref="T:StaMa.Transition"/> at the specified index.
+            </summary>
+            <param name="priority">
+            The zero-based index of the <see cref="T:StaMa.Transition"/> to get.
+            </param>
+            <returns>
+            The <see cref="T:StaMa.Transition"/> at the index.
+            </returns>
+        </member>
+        <member name="P:StaMa.TransitionCollection.Count">
+            <summary>
+            Gets the number of elements contained in the <see cref="T:StaMa.RegionCollection"/>. 
+            </summary>
+        </member>
+        <member name="P:StaMa.TransitionCollection.IsReadOnly">
+            <summary>
+            Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+            </summary>
+        </member>
+        <member name="T:StaMa.StateConfiguration">
+            <summary>
+            Specifies a state configuration in a structured way.
+            </summary>
+            <remarks>
+            Every <see cref="T:StaMa.Region"/> from the <see cref="T:StaMa.StateMachineTemplate"/> occupies a "slot" within the
+            <see cref="T:StaMa.StateConfiguration"/>. These slots are filled with references to <see cref="T:StaMa.State"/> instances or
+            may be left unspecified during initialization of the <see cref="T:StaMa.StateConfiguration"/>.
+            A <see cref="T:StaMa.StateConfiguration"/> that contains unspecified slots is partially specified but may
+            still be compared for compliance with other <see cref="T:StaMa.StateConfiguration"/> instances through the
+            <see cref="M:StaMa.StateConfiguration.IsMatching(StaMa.StateConfiguration)"/> method.
+            </remarks>
+        </member>
+        <member name="M:StaMa.StateConfiguration.#ctor(StaMa.StateMachineTemplate,System.String[])">
+            <summary>
+            Initializes a new <see cref="T:StaMa.StateConfiguration"/> instance.
+            </summary>
+            <param name="stateMachineTemplate">
+            The <see cref="T:StaMa.StateMachineTemplate"/> to which this <see cref="T:StaMa.StateConfiguration"/> applies.
+            </param>
+            <param name="stateBaseConfiguration">
+            A plain list of <see cref="T:System.String"/>s that contain the names of the base <see cref="T:StaMa.State"/> instances that shall compose the <see cref="T:StaMa.StateConfiguration"/>.
+            </param>
+            <remarks>
+            <para>
+            The states referenced through <paramref name="stateBaseConfiguration"/> must be part of disjoint orthogonal sub-regions.
+            </para>
+            <para>
+            In absence of orthogonal sub-regions, a <see cref="T:StaMa.StateConfiguration"/> is sufficiently defined through a single state.
+            Passing in parent states of a single state will not change the <see cref="T:StaMa.StateConfiguration"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            At least one of the states provided through <paramref name="stateBaseConfiguration"/> could not be found.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The states provided through <paramref name="stateBaseConfiguration"/> contains mutually exclusive states.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateConfiguration.IsMatching(StaMa.StateConfiguration)">
+            <summary>
+            Indicates whether a <see cref="T:StaMa.StateConfiguration"/> is compliant with this instance.
+            </summary>
+            <param name="stateConfiguration">
+            The <see cref="T:StaMa.StateConfiguration"/> to be checked.
+            </param>
+            <returns>
+            <c>true</c> if the given <see cref="T:StaMa.StateConfiguration"/> is exactly identical or if it
+            differs only in those slots where the other <see cref="T:StaMa.StateConfiguration"/> isn't specified for a particular <see cref="T:StaMa.Region"/>.
+            <c>false</c> if there are different states for the same <see cref="T:StaMa.Region"/> slot.
+            </returns>
+            <remarks>
+            Every <see cref="T:StaMa.Region"/> from the <see cref="T:StaMa.StateMachineTemplate"/> occupies a "slot" within the
+            <see cref="T:StaMa.StateConfiguration"/>. These slots are filled with references to <see cref="T:StaMa.State"/> instances or
+            may be left unspecified during initialization of the <see cref="T:StaMa.StateConfiguration"/>.
+            A <see cref="T:StaMa.StateConfiguration"/> that contains unspecified slots is partially specified but may
+            still be compared for compliance with other <see cref="T:StaMa.StateConfiguration"/> instances through the
+            <see cref="M:StaMa.StateConfiguration.IsMatching(StaMa.StateConfiguration)"/> method.
+            </remarks>
+        </member>
+        <member name="M:StaMa.StateConfiguration.ToString">
+            <summary>
+            Returns a human readable representation for the <see cref="T:StaMa.StateConfiguration"/>.
+            </summary>
+            <returns>
+            <para>
+            In case of a flat state machine this method simply returns the single state name that was passed in at the constructor.
+            </para>
+            <para>
+            In case of a hierarchical state machine the returned <see cref="T:System.String"/> is a hierachically organized concatenation of the state names passed in at the constructor.
+            </para>
+            <para>
+            In Extended Backus-Naur Form (EBNF) the resulting string rule can be written as
+            </para>
+            <para>
+            StateConfiguration = StateName | StateName , "(" , ConcurrentStateConfigurations, ")" ;
+            </para>
+            <para>
+            ConcurrentStateConfigurations = StateConfiguration | StateConfiguration , "," , ConcurrentStateConfigurations ;
+            </para>
+            <para>
+            Expressed in words, the method returns the top level state name followed by an opening bracket followed by a list of sub state names separated with commas followed by a closing bracket.
+            </para>
+            <para>
+            Examples: "StateA", "StateA(SubRegionStateB)" or "StateA(NestedRegion1StateB,NestedRegion2StateC)"
+            </para>
+            </returns>
+        </member>
+        <member name="M:StaMa.StateConfiguration.Clone">
+            <summary>
+            Creates a new <see cref="T:StaMa.StateConfiguration"/> with identical content.
+            </summary>
+            <returns>
+            A new <see cref="T:StaMa.StateConfiguration"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateConfiguration.PassThrough(StaMa.IStateConfigurationVisitor)">
+            <summary>
+            Allows to collect the names of the contained <see cref="T:StaMa.State"/> instances in a structured way.
+            </summary>
+            <param name="visitor">
+            A <see cref="T:StaMa.IStateConfigurationVisitor"/> instance.
+            </param>
+        </member>
+        <member name="P:StaMa.StateConfiguration.Template">
+            <summary>
+            Gets the <see cref="T:StaMa.StateMachineTemplate"/> to which this <see cref="T:StaMa.StateConfiguration"/> applies.
+            </summary>
+        </member>
+        <member name="T:StaMa.StateMachineActionCallback">
+            <summary>
+            Represents a method that will be called when a <see cref="T:StaMa.State"/> entry, exit or <see cref="T:StaMa.Transition"/> action shall be executed.
+            </summary>
+            <param name="stateMachine">
+            The <see cref="T:StaMa.StateMachine"/> instance that requests invocation of the method.
+            </param>
+            <param name="triggerEvent">
+            An <see cref="T:System.Object"/> that represents the trigger event that was sent to the state machine.
+            </param>
+            <param name="eventArgs">
+            An <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            </param>
+        </member>
+        <member name="T:StaMa.StateMachineGuardCallback">
+            <summary>
+            Represents a method that will be called when a <see cref="T:StaMa.Transition"/> guard shall be executed.
+            </summary>
+            <param name="stateMachine">
+            The <see cref="T:StaMa.StateMachine"/> instance that requests invocation of the method.
+            </param>
+            <param name="triggerEvent">
+            An <see cref="T:System.Object"/> that represents the trigger event that was sent to the state machine.
+            </param>
+            <param name="eventArgs">
+            An <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            </param>
+            <returns>
+            <c>true</c> if the <see cref="T:StaMa.Transition"/> shall be enabled; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:StaMa.StateMachineDoActionCallback">
+            <summary>
+            Represents a method that will be called when a <see cref="T:StaMa.State"/> do action shall be executed.
+            </summary>
+            <param name="stateMachine">
+            The <see cref="T:StaMa.StateMachine"/> instance that requests invocation of the method.
+            </param>
+        </member>
+        <member name="T:StaMa.StateMachine">
+            <summary>
+            Contains the active state of a state machine. Receives the trigger events and
+            executes the actions according to the state machine structure defined by the <see cref="T:StaMa.StateMachineTemplate"/> from which the <see cref="T:StaMa.StateMachine"/> instance is created.
+            </summary>
+            <remarks>
+            Instances of this class are created through the <see cref="M:StaMa.StateMachineTemplate.CreateStateMachine"/> method.
+            </remarks>
+        </member>
+        <member name="M:StaMa.StateMachine.#ctor(StaMa.StateMachineTemplate,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:StaMa.StateMachine"/> instance.
+            </summary>
+            <param name="stateMachineTemplate">
+            The <see cref="T:StaMa.StateMachineTemplate"/> instance that defines the structure for this <see cref="T:StaMa.StateMachine"/>.
+            </param>
+            <param name="context">
+            A <see cref="T:System.Object"/> instance that may be used to provide additional context information
+            within an action or guard condition given through <see cref="T:StaMa.StateMachineActionCallback"/> and <see cref="T:StaMa.StateMachineGuardCallback"/>.
+            The given value will be accessible through the <see cref="P:StaMa.StateMachine.Context"/> property.
+            </param>
+        </member>
+        <member name="M:StaMa.StateMachine.SetContext(System.Object)">
+            <summary>
+            Sets the context in case it is not available before construction of the <see cref="T:StaMa.StateMachine"/>
+            instance.
+            </summary>
+            <param name="context">
+            A <see cref="T:System.Object"/> instance that may be used to provide additional context information
+            within an action or guard condition given through <see cref="T:StaMa.StateMachineActionCallback"/> and <see cref="T:StaMa.StateMachineGuardCallback"/>.
+            </param>
+        </member>
+        <member name="M:StaMa.StateMachine.ToString">
+            <summary>
+            Returns the human readable representation of the active state <see cref="T:StaMa.StateConfiguration"/> of this <see cref="T:StaMa.StateMachine"/>.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> with a textual representation of the <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> property.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachine.Startup">
+            <summary>
+            Brings the <see cref="T:StaMa.StateMachine"/> in the initial state by invoking the entry actions
+            of the initial states. Resets the event queue and initializes the history.
+            </summary>
+            <remarks>
+            In order to trigger any completion transitions emanating from the initial states
+            a <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/> with <c>null</c> must be sent to the state machine.
+            </remarks>
+        </member>
+        <member name="M:StaMa.StateMachine.SaveState(System.IO.Stream)">
+            <summary>
+            Saves the state machine active state and history to a <see cref="T:System.IO.Stream"/> that may be used to resume with this state later e.g. after the hosting process has been restarted.
+            </summary>
+            <param name="outputStream">
+            A <see cref="T:System.IO.Stream"/> that receives the serialized <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> and history states.
+            </param>
+            <remarks>
+            The data written to the <paramref name="outputStream"/> is used as the input for the <see cref="M:StaMa.StateMachine.Resume(System.IO.Stream,System.Boolean)"/> method.
+            </remarks>
+            <example>
+            <para>
+            The following code shows how to use the <see cref="M:StaMa.StateMachine.SaveState(System.IO.Stream)">SaveState</see> and <see cref="M:StaMa.StateMachine.Resume(System.IO.Stream,System.Boolean)">Resume</see> methods:
+            </para>
+            <code source="..\Tests\StaMaTest\SaveStateResumeTests.cs" region="DevelopersGuide_SaveStateAndResume" lang="C#" title="SaveState and Resume"/>
+            </example>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="outputStream"/> parameter is <c>null</c></exception>
+            <exception cref="T:System.ArgumentException">The <paramref name="outputStream"/> cannot be written.</exception>
+            <exception cref="T:StaMa.StateMachineException">This <see cref="T:StaMa.StateMachine"/> instance is not yet started or already finished and thus has no valid <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/>.</exception>
+        </member>
+        <member name="M:StaMa.StateMachine.Resume(System.IO.Stream,System.Boolean)">
+            <summary>
+            Initializes the <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> and history settings from a <see cref="T:System.IO.Stream"/> and resumes state machine execution with the stored state.
+            </summary>
+            <param name="inputStream">
+            A <see cref="T:System.IO.Stream"/> that contains the serialized <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> and history states.
+            </param>
+            <param name="executeEntryActions">
+            Indicates if the entry actions and do actions of the serialized <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> shall be executed. 
+            </param>
+            <remarks>
+            <para>
+            The <see cref="M:StaMa.StateMachine.Resume(System.IO.Stream,System.Boolean)"/> method is an alternative to the <see cref="M:StaMa.StateMachine.Startup"/> and leaves the state machine in the operable state that accepts events through the <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </para>
+            <para>
+            It is assumed that the contents of the given <paramref name="inputStream"/> can be read and that the structure of the state machine template has not changed since the
+            contents were written.
+            Compatibility of the structure is tested by comparing a signature computed from the current <see cref="T:StaMa.StateMachineTemplate"/> structure with the signature that was computed and embedded when the state was saved.
+            The default algorithm for computing the signature is the platform string hash code algorithm applied to a string that describes the entire <see cref="T:StaMa.StateMachineTemplate"/> structure.
+            Applications might change the signature algorithm by setting the <see cref="P:StaMa.StateMachineTemplate.SerializationSignatureGenerator"/> property.
+            </para>
+            </remarks>
+            <example>
+            <para>
+            The following code shows how to use the <see cref="M:StaMa.StateMachine.SaveState(System.IO.Stream)">SaveState</see> and <see cref="M:StaMa.StateMachine.Resume(System.IO.Stream,System.Boolean)">Resume</see> methods:
+            </para>
+            <code source="..\Tests\StaMaTest\SaveStateResumeTests.cs" region="DevelopersGuide_SaveStateAndResume" lang="C#" title="SaveState and Resume"/>
+            </example>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="inputStream"/> parameter is <c>null</c></exception>
+            <exception cref="T:System.ArgumentException">The contents of the <paramref name="inputStream"/> are not compatible with the current <see cref="T:StaMa.StateMachineTemplate"/> structure,
+            e.g. states or regions might have been added to or removed from the <see cref="T:StaMa.StateMachineTemplate"/> since the content was created.</exception>
+            <exception cref="T:System.IO.IOException">The <paramref name="inputStream"/> is corrupt.</exception>
+        </member>
+        <member name="M:StaMa.StateMachine.Finish">
+            <summary>
+            Finalizes the <see cref="T:StaMa.StateMachine"/> by executing the
+            exit actions of all active states.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateMachine.SendTriggerEvent(System.Object)">
+            <summary>
+            Enqueues a trigger event and starts processing the state machine, if not already inside a processing.
+            As a result a transition may be executed by invoking exit actions, changing the active state and invoking entry actions.
+            </summary>
+            <param name="triggerEvent">
+            An <see cref="T:System.Object"/> that represents the trigger event that is sent to the state machine or <c>null</c> to trigger the evaluation of transitions having an "any" event.
+            The <see cref="T:System.Object"/>  will be compared using <see cref="M:System.Object.Equals(System.Object)"/> to the value of the <see cref="P:StaMa.Transition.TriggerEvent"/> property of the active <see cref="T:StaMa.Transition"/> instances.
+            </param>
+            <returns>
+            The number of executed state machine steps.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachine.SendTriggerEvent(System.Object,System.EventArgs)">
+            <summary>
+            Enqueues a trigger event together with additional parameters and starts processing the state machine, if not already inside a processing.
+            As a result a transition may be executed by invoking exit actions, changing the active state and invoking entry actions.
+            </summary>
+            <param name="triggerEvent">
+            An <see cref="T:System.Object"/> that represents the trigger event that is sent to the state machine or <c>null</c> to trigger the evaluation of transitions having an "any" event.
+            The <see cref="T:System.Object"/>  will be compared using <see cref="M:System.Object.Equals(System.Object)"/> to the value of the <see cref="P:StaMa.Transition.TriggerEvent"/> property of the active <see cref="T:StaMa.Transition"/> instances.
+            </param>
+            <param name="eventArgs">
+            An <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            The additional parameters may be used in the guard conditions of the active <see cref="T:StaMa.Transition"/> instances.
+            </param>
+            <returns>
+            The number of executed state machine steps.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachine.IsInState(StaMa.StateConfiguration)">
+            <summary>
+            Returns whether the <see cref="T:StaMa.StateMachine"/> resides in the
+            given <see cref="T:StaMa.StateConfiguration"/>.
+            </summary>
+            <param name="stateConfiguration">
+            A <see cref="T:StaMa.StateConfiguration"/> instance that describes
+            a (potentially partially specified) state configuration.
+            </param>
+            <returns>
+            <c>true</c> if the <see cref="T:StaMa.StateMachine"/> is in the given <paramref name="stateConfiguration"/>;
+            otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachine.ClearEventQueue">
+            <summary>
+            Discards any pending events in the event queue of the <see cref="T:StaMa.StateMachine"/>.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateMachine.Context">
+            <summary>
+            Gets additional client provided context information.
+            </summary>
+            <value>
+            A <see cref="T:System.Object"/> instance that may be used to provide additional context information
+            within an action or guard condition given through <see cref="T:StaMa.StateMachineActionCallback"/> and <see cref="T:StaMa.StateMachineGuardCallback"/>.
+            </value>
+            <remarks>
+            The <see cref="P:StaMa.StateMachine.Context"/> property may be used in case the <see cref="T:StaMa.StateMachineActionCallback"/>
+            are coosen as static methods of the client class of the <see cref="T:StaMa.StateMachine"/>. In this case the
+            <see cref="P:StaMa.StateMachine.Context"/> property may carry the client instance in order to
+            forward the action to non-static methods of the client instance.
+            This may be a reasonable strategy in case there are many <see cref="T:StaMa.StateMachine"/> instances
+            with the same <see cref="T:StaMa.StateMachineTemplate"/>. Coosing the <see cref="T:StaMa.StateMachineTemplate"/>
+            as a static member of the client class could then improve startup performance of state
+            machines doing the structural checks in the <see cref="T:StaMa.StateMachineTemplate"/> only once for all
+            <see cref="T:StaMa.StateMachine"/> instances.
+            </remarks>
+        </member>
+        <member name="P:StaMa.StateMachine.TraceStateChange">
+            <summary>
+            Gets or sets a callback that can be used for tracing state changes in the <see cref="T:StaMa.StateMachine"/>.
+            </summary>
+            <remarks>
+            The delegate will be called when the <see cref="T:StaMa.StateMachine"/> changes its active state.
+            <para>
+            The <see cref="T:StaMa.StateMachine"/> passes the following parameters to the callback:
+            <list type="number">
+            <item>
+            The <see cref="T:StaMa.StateMachine"/> instance that changes the state.
+            </item>
+            <item>
+            The <see cref="T:StaMa.StateConfiguration"/> instance that represents the old state.
+            </item>
+            <item>
+            The <see cref="T:StaMa.StateConfiguration"/> instance that represents the new state.
+            </item>
+            <item>
+            The <see cref="T:StaMa.Transition"/> that conveys the state machine from the old state to the new state.
+            </item>
+            </list>
+            </para>
+            <para>
+            The intended purpose of this callback is purely for tracing or analysis purposes.
+            The callback is expected to not interfere with the state machine excution.
+            Actions within a state machine shall solely be executed through the <see cref="P:StaMa.State.EntryAction"/>,
+            <see cref="P:StaMa.State.ExitAction"/> and <see cref="P:StaMa.Transition.TransitionAction"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:StaMa.StateMachine.TraceDispatchTriggerEvent">
+            <summary>
+            Gets or sets a callback that can be used for tracing the <see cref="T:StaMa.StateMachine"/> operation.
+            </summary>
+            <remarks>
+            The delegate will be called whenever the event queue dispatches an event to the state machine.
+            <para>
+            The <see cref="T:StaMa.StateMachine"/> passes the following parameters to the callback:
+            <list type="number">
+            <item>
+            The <see cref="T:StaMa.StateMachine"/> instance that dispatches the event.
+            </item>
+            <item>
+            The <see cref="T:System.Object"/> that represents the trigger event that was sent to the state machine.
+            </item>
+            <item>
+            The <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            </item>
+            </list>
+            </para>
+            <para>
+            The intended purpose of this callback is purely for tracing or analysis purposes.
+            The callback is expected to not interfere with the state machine excution.
+            Actions within a state machine shall solely be executed through the <see cref="P:StaMa.State.EntryAction"/>,
+            <see cref="P:StaMa.State.ExitAction"/> and <see cref="P:StaMa.Transition.TransitionAction"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:StaMa.StateMachine.TraceTestTransition">
+            <summary>
+            Gets or sets a callback that can be used for tracing and analyzing the <see cref="T:StaMa.StateMachine"/> operation.
+            </summary>
+            <remarks>
+            The delegate will be called when the event queue dispatches an event to the state machine for every <see cref="T:StaMa.Transition"/> that is regarded as active.
+            <para>
+            The <see cref="T:StaMa.StateMachine"/> passes the following parameters to the callback:
+            <list type="number">
+            <item>
+            The <see cref="T:StaMa.StateMachine"/> instance that investigates the event.
+            </item>
+            <item>
+            The <see cref="T:StaMa.Transition"/> instance that investigates the event.
+            </item>
+            <item>
+            The <see cref="T:System.Object"/> that represents the trigger event that was sent to the state machine.
+            </item>
+            <item>
+            The <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            </item>
+            </list>
+            </para>
+            <para>
+            The intended purpose of this callback is purely for tracing or analysis purposes.
+            The callback is expected to not interfere with the state machine excution.
+            Actions within a state machine shall solely be executed through the <see cref="P:StaMa.State.EntryAction"/>,
+            <see cref="P:StaMa.State.ExitAction"/> and <see cref="P:StaMa.Transition.TransitionAction"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:StaMa.StateMachine.Template">
+            <summary>
+            Gets the <see cref="T:StaMa.StateMachineTemplate"/> instance that defines the structure for this <see cref="T:StaMa.StateMachine"/>.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateMachine.ActiveStateConfiguration">
+            <summary>
+            Gets the active state of the <see cref="T:StaMa.StateMachine"/> instance.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateConfiguration"/> that contains the set of active states.
+            In case the <see cref="T:StaMa.StateMachineTemplate"/> has a structure with concurrent (orthogonal) states
+            the active state is defined by more than one <see cref="T:StaMa.State"/> instance.
+            </value>
+        </member>
+        <member name="T:StaMa.StateMachine.TraceStateChangeEventHandler">
+            <summary>
+            Represents a method that will be called for tracing state changes in the <see cref="T:StaMa.StateMachine"/>.
+            </summary>
+            <param name="stateMachine">
+            The source <see cref="T:StaMa.StateMachine"/> instance that raises the event.
+            </param>
+            <param name="stateConfigurationFrom">
+            A <see cref="T:StaMa.StateConfiguration"/> instance that represents the old state.
+            </param>
+            <param name="stateConfigurationTo">
+            A <see cref="T:StaMa.StateConfiguration"/> instance that represents the new state.
+            </param>
+            <param name="transition">
+            The <see cref="T:StaMa.Transition"/> that conveys the state machine from the old state to the new state.
+            </param>
+            <remarks>
+            This event handler is not intended to interfere with the state machine excution.
+            Actions within the state machine shall solely be executed through the <see cref="P:StaMa.State.EntryAction"/>,
+            <see cref="P:StaMa.State.ExitAction"/> and <see cref="P:StaMa.Transition.TransitionAction"/>.
+            The purpose of this event handler is purely tracing for analysis purposes or other.
+            </remarks>
+        </member>
+        <member name="T:StaMa.StateMachine.TraceDispatchTriggerEventEventHandler">
+            <summary>
+            Represents a method that will be called whenever the event queue dispatches an event to the state machine.
+            </summary>
+            <param name="stateMachine">
+            The source <see cref="T:StaMa.StateMachine"/> instance that raises the event.
+            </param>
+            <param name="triggerEvent">
+            An <see cref="T:System.Object"/> that represents the trigger event that was sent to the state machine.
+            </param>
+            <param name="eventArgs">
+            An <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            </param>
+        </member>
+        <member name="T:StaMa.StateMachine.TraceTestTransitionEventHandler">
+            <summary>
+            Represents a method that will be called for tracing which transitions are
+            considered by the state machine as active during a <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/> or <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object,System.EventArgs)"/> call.
+            </summary>
+            <param name="stateMachine">
+            The source <see cref="T:StaMa.StateMachine"/> instance that raises the event.
+            </param>
+            <param name="transition">
+            The <see cref="T:StaMa.Transition"/> instance that is evaluated
+            </param>
+            <param name="triggerEvent">
+            An <see cref="T:System.Object"/> that represents the trigger event that was sent to the state machine.
+            </param>
+            <param name="eventArgs">
+            An <see cref="T:System.EventArgs"/> instance that carries additional parameters accompanying the trigger event.
+            </param>
+        </member>
+        <member name="T:StaMa.StateMachineException">
+            <summary>
+            The exception that is thrown during creation of the state machine template when creation rules are violated.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateMachineException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:StaMa.StateMachineException"/> class.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateMachineException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:StaMa.StateMachineException"/> class with a specified error message.
+            </summary>
+            <param name="message">
+            The message that describes the error.
+            </param>
+        </member>
+        <member name="M:StaMa.StateMachineException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:StaMa.StateMachineException"/> class with
+            a specified error message and a reference to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">
+            The error message that explains the reason for the exception
+            </param>
+            <param name="innerException">
+            The exception that is the cause of the current exception.
+            If the <paramref name="innerException"/> is not <c>null</c>, the
+            current exception is raised in a catch block that handles the inner exception.
+            </param>
+        </member>
+        <member name="T:StaMa.StateMachineOptions">
+            <summary>
+            Defines optional behavior or functionality for the state machines.
+            </summary>
+        </member>
+        <member name="F:StaMa.StateMachineOptions.None">
+            <summary>
+            <para>
+            Defines the default behavior for state machines.
+            </para>
+            <para>
+            The default behavior is optimized for event driven state machines.
+            </para>
+            </summary>
+        </member>
+        <member name="F:StaMa.StateMachineOptions.UseDoActions">
+            <summary>
+            <para>
+            Defines that the execution of do-actions is enabled.
+            </para>
+            <para>
+            Do-actions are executed "while" a state machine stays in a state, in particular whenever the <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object,System.EventArgs)">StateMachine.SendTriggerEvent</see> method is called,
+            after every individual state change or once, in case no state change occurred.
+            </para>
+            <para>
+            Do-actions are specified like entry- and exit-actions through the <see cref="M:StaMa.StateMachineTemplate.State(System.String,StaMa.StateMachineActionCallback,StaMa.StateMachineActionCallback,StaMa.StateMachineDoActionCallback)">StateMachineTemplate.State</see> method.
+            </para>
+            <para>
+            Do-actions can e.g. be used to run digital open or closed control loop algorithms for binary or continuous values when a state machine is regularly triggered in a cycle.
+            Opposed to this, event driven state machines are only sporadically triggered when events occur or timers elapse, thus they don't benefit from do-actions.
+            </para>
+            </summary>
+        </member>
+        <member name="T:StaMa.SignatureGenerator">
+            <summary>
+            Represents a method that calculates a hash value for a <see cref="T:System.String"/>.
+            </summary>
+            <param name="input">
+            The <see cref="T:System.String"/> for which to calculate the hash value.
+            </param>
+            <returns>
+            A <see cref="T:System.String"/> that contains the hash value for the <paramref name="input"/> value.
+            </returns>
+        </member>
+        <member name="T:StaMa.StateMachineTemplate">
+            <summary>
+            Contains the structure and behaviour definition of a state machine.
+            </summary>
+            <remarks>
+            <see cref="T:StaMa.StateMachine"/> instances with identical behaviour may be created
+            from an instance of this class through the <see cref="M:StaMa.StateMachineTemplate.CreateStateMachine"/> method.
+            The <see cref="T:StaMa.StateMachine"/> instances interpret the structure definition in
+            the <see cref="T:StaMa.StateMachineTemplate"/> instance during trigger event dispatching and
+            accordingly execute state entry and exit callbacks.
+            </remarks>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:StaMa.StateMachineTemplate"/> class.
+            </summary>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.#ctor(StaMa.StateMachineOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:StaMa.StateMachineTemplate"/> class with specific options.
+            </summary>
+            <param name="stateMachineOptions">
+            Defines the option flags for the state machine.
+            </param>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)">
+            <summary>
+            Creates a <see cref="T:StaMa.Region"/> instance and precedes the definition of the <see cref="T:StaMa.Region"/>'s <see cref="T:StaMa.State"/>s.
+            </summary>
+            <param name="initialStateName">
+            A <see cref="T:System.String"/> that defines the name of the <see cref="T:StaMa.Region"/>'s initial <see cref="T:StaMa.State"/>.
+            </param>
+            <param name="hasHistory">
+            <c>true</c> if the <see cref="T:StaMa.Region"/> shall have a shallow history; otherwise, <c>false</c>.
+            </param>
+            <remarks>
+            <para>
+            This method must be used paired with an <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.EndRegion"/> statement.
+            </para>
+            <para>
+            Each pair of enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> ... <see cref="M:StaMa.StateMachineTemplate.EndState"/> statements will add a <see cref="T:StaMa.State"/> to the <see cref="T:StaMa.Region"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="initialStateName"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.EndRegion">
+            <summary>
+            Completes the definition of a <see cref="T:StaMa.Region"/>'s <see cref="T:StaMa.State"/>s.
+            </summary>
+            <remarks>
+            <para>
+            This method must be used paired after a <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> statement to
+            conclude the definition of the contents of a <see cref="T:StaMa.Region"/>.
+            </para>
+            <para>
+            The syntactic validation of the <see cref="T:StaMa.StateMachineTemplate"/> is started within this statement, if this is the
+            paired <see cref="T:StaMa.StateMachineTemplate"/>.EndRegion statement for the top level <see cref="T:StaMa.Region"/> instance within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            If the validation is successful, the <see cref="T:StaMa.StateMachineTemplate"/> instance is ready for creating <see cref="T:StaMa.StateMachine"/> instances
+            by invoking <see cref="O:StaMa.StateMachineTemplate.CreateStateMachine"/>.
+            </para>
+            </remarks>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.State(System.String,StaMa.StateMachineActionCallback,StaMa.StateMachineActionCallback,StaMa.StateMachineDoActionCallback)">
+            <summary>
+            Creates a <see cref="T:StaMa.State"/> instance and starts the definition the <see cref="T:StaMa.State"/>'s substructure and contents.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.State"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="entryAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            enters the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no entry action is specified.
+            </param>
+            <param name="exitAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            leaves the the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no exit action is specified.
+            </param>
+            <param name="doAction">
+            The <see cref="T:StaMa.StateMachineDoActionCallback"/> delegate that defines the perpetual action to be executed while the <see cref="T:StaMa.StateMachine"/> is in this <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no do action is specified.
+            </param>
+            <remarks>
+            <para>
+            This method must be used paired with an <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.EndState"/> statement.
+            </para>
+            <para>
+            An enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.Transition"/> statement adds a <see cref="T:StaMa.Transition"/> emanating from this <see cref="T:StaMa.State"/>.
+            </para>
+            <para>
+            Each pair of enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> ... <see cref="M:StaMa.StateMachineTemplate.EndRegion"/> statements will add a hierarchical sub-<see cref="T:StaMa.Region"/> to the <see cref="T:StaMa.State"/>.
+            </para>
+            <para>
+            The <paramref name="doAction"/> is executed whenever the <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object,System.EventArgs)">StateMachine.SendTriggerEvent</see> method is called,
+            therein after every individual state change or once, in case no state change occurred.
+            </para>
+            <para>
+            Do-actions can e.g. be used to run digital open or closed control loop algorithms for binary or continuous values when a state machine is regularly triggered in a cycle.
+            Opposed to this, event driven state machines are only sporadically triggered when events occur or timers elapse, thus they don't benefit from do-actions.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentException">
+            The <paramref name="doAction"/> is valid, but do actions are not enabled for this <see cref="T:StaMa.StateMachineTemplate"/>.
+            To enable do actions, please create the <see cref="T:StaMa.StateMachineTemplate"/> instance with the <see cref="P:StaMa.StateMachineTemplate.StateMachineOptions"/>.UseDoActions flag specified at the constructor.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.State"/>: The identifier of a <see cref="T:StaMa.State"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.State"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.State(System.String,StaMa.StateMachineActionCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Creates a <see cref="T:StaMa.State"/> instance and starts the definition the <see cref="T:StaMa.State"/>'s substructure and contents.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.State"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="entryAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            enters the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no entry action is specified.
+            </param>
+            <param name="exitAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            leaves the the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no exit action is specified.
+            </param>
+            <remarks>
+            <para>
+            This method must be used paired with an <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.EndState"/> statement.
+            </para>
+            <para>
+            An enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.Transition"/> statement adds a <see cref="T:StaMa.Transition"/> emanating from this <see cref="T:StaMa.State"/>.
+            </para>
+            <para>
+            Each pair of enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> ... <see cref="M:StaMa.StateMachineTemplate.EndRegion"/> statements will add a hierarchical sub-<see cref="T:StaMa.Region"/> to the <see cref="T:StaMa.State"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.State"/>: The identifier of a <see cref="T:StaMa.State"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.State"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.State(System.String)">
+            <summary>
+            Creates a <see cref="T:StaMa.State"/> instance and starts the definition the <see cref="T:StaMa.State"/>'s substructure and contents.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.State"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <remarks>
+            <para>
+            This method must be used paired with an <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.EndState"/> statement.
+            </para>
+            <para>
+            An enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.Transition"/> statement adds a <see cref="T:StaMa.Transition"/> emanating from this <see cref="T:StaMa.State"/>.
+            </para>
+            <para>
+            Each pair of enclosed <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> ... <see cref="M:StaMa.StateMachineTemplate.EndRegion"/> statements will add a hierarchical sub-<see cref="T:StaMa.Region"/> to the <see cref="T:StaMa.State"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.State"/>: The identifier of a <see cref="T:StaMa.State"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.State"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.EndState">
+            <summary>
+            Completes the definition of a <see cref="T:StaMa.State"/>'s substructure and contents.
+            </summary>
+            <remarks>
+            This method must be used paired after a <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> statement to
+            conclude the definition of the contents of a <see cref="T:StaMa.State"/>.
+            </remarks>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.Object)">
+            <summary>
+            Creates a <see cref="T:StaMa.Transition"/> that starts at the <see cref="T:StaMa.State"/> defined by the enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> statements.
+            </summary>
+            <param name="name">
+            A name that identifies the <see cref="T:StaMa.Transition"/> for debugging and tracing purposes. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="targetState">
+            The name of a <see cref="T:StaMa.State"/> instance that defines the target-<see cref="T:StaMa.State"/> of the <see cref="T:StaMa.Transition"/>.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <remarks>
+            <para>
+            The <paramref name="targetState"/> may reference any <see cref="T:StaMa.State"/> within this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String[],System.Object)">
+            <summary>
+            Creates a fork <see cref="T:StaMa.Transition"/> that starts at the <see cref="T:StaMa.State"/> defined by the enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> statements.
+            </summary>
+            <param name="name">
+            A name that identifies the <see cref="T:StaMa.Transition"/> for debugging and tracing purposes. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="targetStates">
+            A list of names of <see cref="T:StaMa.State"/> instances that define the target-<see cref="T:StaMa.State"/> instances of the <see cref="T:StaMa.Transition"/>.
+            The <paramref name="targetStates"/> collection must form a valid <see cref="T:StaMa.State"/> configuration within this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <remarks>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.String,System.Object)">
+            <summary>
+            Creates a <see cref="T:StaMa.Transition"/> from the <see cref="T:StaMa.State"/> defined by the enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> ... <see cref="M:StaMa.StateMachineTemplate.EndState"/> statements.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to identify the <see cref="T:StaMa.Transition"/> for debugging and tracing purposes. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceState">
+            The name of a <see cref="T:StaMa.State"/> instance that defines the <see cref="T:StaMa.Transition"/> source-<see cref="T:StaMa.State"/>.
+            </param>
+            <param name="targetState">
+            The name of a <see cref="T:StaMa.State"/> instance that defines the <see cref="T:StaMa.Transition"/> target-<see cref="T:StaMa.State"/>.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <remarks>
+            <para>
+            The <paramref name="sourceState"/> may only reference a <see cref="T:StaMa.State"/> that is a sub-<see cref="T:StaMa.State"/> of the anchor-<see cref="T:StaMa.State"/>.
+            </para>
+            <para>
+            The <paramref name="targetState"/> may reference any <see cref="T:StaMa.State"/> within this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </para>
+            <para>
+            Usually the <paramref name="sourceState"/> will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> ... <see cref="M:StaMa.StateMachineTemplate.EndState"/> statements.
+            </para>
+            <para>
+            In some cases it may be useful to define a <see cref="T:StaMa.Transition"/> on a higher hierarchical level in order to raise the <see cref="T:StaMa.Transition"/>'s priority above other
+            transitions that would otherwise be handled premptive due to their hierarchy level.
+            For such cases the <paramref name="sourceState"/> will reference a <see cref="T:StaMa.State"/>
+            that is hierachically nested within the immediate enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/> ... <see cref="M:StaMa.StateMachineTemplate.EndState"/> statement pair.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String[],System.String,System.Object)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceStates">
+            A list of names of the transition source states.
+            </param>
+            <param name="targetState">
+            A state name if the transition target is a single state.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceStates"/> may reference a set of <see cref="T:StaMa.State"/> instances on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.String[],System.Object)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceState">
+            A state name if the transition source is a single state.
+            </param>
+            <param name="targetStates">
+            A list of names of the transition target states.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceState"/> may reference a <see cref="T:StaMa.State"/> on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String[],System.String[],System.Object)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceStates">
+            A list of names of the transition source states.
+            </param>
+            <param name="targetStates">
+            A list of names of the transition target states.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceStates"/> may reference a set of <see cref="T:StaMa.State"/> instances on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Creates a <see cref="T:StaMa.Transition"/> that starts at the <see cref="T:StaMa.State"/> defined by the enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> statements.
+            </summary>
+            <param name="name">
+            A name that identifies the <see cref="T:StaMa.Transition"/> for debugging and tracing purposes. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="targetState">
+            The name of a <see cref="T:StaMa.State"/> instance that defines the target-<see cref="T:StaMa.State"/> of the <see cref="T:StaMa.Transition"/>.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            <para>
+            The <paramref name="targetState"/> may reference any <see cref="T:StaMa.State"/> within this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String[],System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Creates a <see cref="T:StaMa.Transition"/> that starts at the <see cref="T:StaMa.State"/> defined by the enclosing <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.State"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> statements.
+            </summary>
+            <param name="name">
+            A name that identifies the <see cref="T:StaMa.Transition"/> for debugging and tracing purposes. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="targetStates">
+            A list of names of <see cref="T:StaMa.State"/> instances that define the target-<see cref="T:StaMa.State"/> instances of the <see cref="T:StaMa.Transition"/>.
+            The <paramref name="targetStates"/> collection must form a valid <see cref="T:StaMa.State"/> configuration within this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.String,System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceState">
+            A state name if the transition source is a single state.
+            </param>
+            <param name="targetState">
+            A state name if the transition target is a single state.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceState"/> may reference a <see cref="T:StaMa.State"/> on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.String[],System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceState">
+            A state name if the transition source is a single state.
+            </param>
+            <param name="targetStates">
+            A list of names of the transition target states.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceState"/> may reference a <see cref="T:StaMa.State"/> on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String[],System.String,System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceStates">
+            A list of names of the transition source states.
+            </param>
+            <param name="targetState">
+            A state name if the transition target is a single state.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceStates"/> may reference a set of <see cref="T:StaMa.State"/> instances on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.Transition(System.String,System.String[],System.String[],System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Defines a transition emanating from state defined through
+            the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/>...<see cref="M:StaMa.StateMachineTemplate.EndState"/> calls.
+            </summary>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceStates">
+            A list of names of the transition source states.
+            </param>
+            <param name="targetStates">
+            A list of names of the transition target states.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            <para>
+            The source state may only reference a state or state configuration of sub-states of the anchor state.
+            </para>
+            <para>
+            The target state may reference any state or state configuration within the state machine template.
+            </para>
+            <para>
+            Usually the source state will be identical with the name of the <see cref="T:StaMa.State"/> defined
+            through the enclosing <see cref="M:StaMa.StateMachineTemplate.State(System.String)"/> call. In some cases it may be useful to
+            define a transition on a higher hierarchical level in order to raise its priority above other
+            transitions that are handled premptive due to their hierarchy level. For such cases
+            the <paramref name="sourceStates"/> may reference a set of <see cref="T:StaMa.State"/> instances on a hierarchical lower
+            layer than the immediate <see cref="T:StaMa.State"/> parent.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="name"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a valid identifier for a <see cref="T:StaMa.Transition"/>: The identifier of a <see cref="T:StaMa.Transition"/> must start with a character followed by nonspace characters or digits.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <paramref name="name"/> is not a unique: A <see cref="T:StaMa.Transition"/> with the same name already exists within the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </exception>
+            <exception cref="T:StaMa.StateMachineException">
+            A syntax error was detected with this or the preceeding Region, EndRegion, State, EndState or Transition statements.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.CreateStateMachine">
+            <summary>
+            Creates a <see cref="T:StaMa.StateMachine"/> instance from the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </summary>
+            <returns>
+            A new <see cref="T:StaMa.StateMachine"/> instance.
+            </returns>
+            <remarks>
+            The <see cref="T:StaMa.StateMachine"/> is a lightweight object composed of very few members.
+            State names and all other runtime meta information are used per reference from the <see cref="T:StaMa.StateMachineTemplate"/>.
+            A <see cref="T:StaMa.StateMachine"/> contains essentially the following data:
+            <list type="bullet">
+            <item> 
+            <description>
+            A reference to a <see cref="T:StaMa.State"/> that is currently the active state for this state machine.
+            In case of orthogonal regions the active state for each orthogonal region is referenced.
+            The active states are accessible through the <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> property.
+            </description> 
+            </item>
+            <item> 
+            <description>
+            A reference to a <see cref="T:StaMa.State"/> for each region to keep the history.
+            </description> 
+            </item> 
+            <item> 
+            <description>
+            A queue that intermediately caches events sent to the state machine during execution of actions.
+            </description> 
+            </item> 
+            </list>
+            <para>
+            All further structural information needed e.g. for transition
+            evaluation is taken from the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </para>
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">
+            A <see cref="T:StaMa.StateMachine"/> instance cannot be created when the <see cref="T:StaMa.StateMachineTemplate"/> is not complete.
+            The <see cref="P:StaMa.StateMachineTemplate.Root"/> property is not initialized to a valid <see cref="T:StaMa.Region"/> instance.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.CreateStateMachine(System.Object)">
+            <summary>
+            Creates a <see cref="T:StaMa.StateMachine"/> instance from the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </summary>
+            <param name="context">
+            An <see cref="T:System.Object"/> that may be used to transport additional context information
+            to the <see cref="T:StaMa.StateMachineActionCallback"/>. The given value will be accessible through
+            the <see cref="P:StaMa.StateMachine.Context"/> property.
+            </param>
+            <returns>
+            A new <see cref="T:StaMa.StateMachine"/> instance.
+            </returns>
+            <remarks>
+            The <see cref="T:StaMa.StateMachine"/> is a lightweight object composed of very few members.
+            State names and all other runtime meta information are used per reference from the <see cref="T:StaMa.StateMachineTemplate"/>.
+            A <see cref="T:StaMa.StateMachine"/> contains essentially the following data:
+            <list type="bullet">
+            <item> 
+            <description>
+            A reference to a <see cref="T:StaMa.State"/> that is currently the active state for this state machine.
+            In case of orthogonal regions the active state for each orthogonal region is referenced.
+            The active states are accessible through the <see cref="P:StaMa.StateMachine.ActiveStateConfiguration"/> property.
+            </description> 
+            </item>
+            <item> 
+            <description>
+            A reference to a <see cref="T:StaMa.State"/> for each region to keep the history.
+            </description> 
+            </item> 
+            <item> 
+            <description>
+            A queue that intermediately caches events sent to the state machine during execution of actions.
+            </description> 
+            </item> 
+            </list>
+            <para>
+            All further structural information needed e.g. for transition
+            evaluation is taken from the <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </para>
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">
+            A <see cref="T:StaMa.StateMachine"/> instance cannot be created when the <see cref="T:StaMa.StateMachineTemplate"/> is not complete.
+            The <see cref="P:StaMa.StateMachineTemplate.Root"/> property is not initialized to a valid <see cref="T:StaMa.Region"/> instance.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.CreateStateConfiguration(System.String)">
+            <summary>
+            Creates a new <see cref="T:StaMa.StateConfiguration"/> instance from a state name.
+            </summary>
+            <param name="stateName">
+            A <see cref="T:System.String"/> that references a <see cref="T:StaMa.State"/> within
+            this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <returns>
+            A <see cref="T:StaMa.StateConfiguration"/> instance.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="stateName"/> is <c>null</c> or empty.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            A <see cref="T:StaMa.StateConfiguration"/> instance cannot be created when the <see cref="T:StaMa.StateMachineTemplate"/> is not complete.
+            The <see cref="P:StaMa.StateMachineTemplate.Root"/> property is not initialized to a valid <see cref="T:StaMa.Region"/> instance.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <see cref="T:StaMa.State"/> instance provided through <paramref name="stateName"/> could not be found.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.CreateStateConfiguration(System.String[])">
+            <summary>
+            Creates a new <see cref="T:StaMa.StateConfiguration"/> instance from a list of state names.
+            </summary>
+            <param name="stateBaseConfiguration">
+            A list of <see cref="T:System.String"/> that reference <see cref="T:StaMa.State"/> instances within this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <returns>
+            A <see cref="T:StaMa.StateConfiguration"/> instance.
+            </returns>
+            <remarks>
+            <para>
+            The <see cref="T:StaMa.State"/> instances referenced through <paramref name="stateBaseConfiguration"/> must be part of disjoint orthogonal sub-regions.
+            </para>
+            <para>
+            In absence of orthogonal sub-regions, a <see cref="T:StaMa.StateConfiguration"/> is sufficiently defined through a single state.
+            Passing in the parent states of the single state will not further improve or change the <see cref="T:StaMa.StateConfiguration"/>.
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+            The <paramref name="stateBaseConfiguration"/> is <c>null</c>.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            A <see cref="T:StaMa.StateConfiguration"/> instance cannot be created when the <see cref="T:StaMa.StateMachineTemplate"/> is not complete.
+            The <see cref="P:StaMa.StateMachineTemplate.Root"/> property is not initialized to a valid <see cref="T:StaMa.Region"/> instance.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            At least one of the <see cref="T:StaMa.State"/> instances provided through <paramref name="stateBaseConfiguration"/> could not be found.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The <see cref="T:StaMa.State"/> instances provided through <paramref name="stateBaseConfiguration"/> contain mutually exclusive <see cref="T:StaMa.State"/> instances,
+            e.g. <see cref="T:StaMa.State"/> instances from the same <see cref="T:StaMa.Region"/> instance.
+            </exception>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.PassThrough(StaMa.IStateMachineTemplateVisitor)">
+            <summary>
+            Provides the accept method of a visitor pattern that traverses
+            the <see cref="T:StaMa.Region"/>, <see cref="T:StaMa.State"/> and <see cref="T:StaMa.Transition"/> instances
+            of this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </summary>
+            <param name="visitor">
+            A <see cref="T:StaMa.IStateMachineTemplateVisitor"/> instance.
+            </param>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.IsValidIdentifier(System.String)">
+            <summary>
+            Checks whether the given <paramref name="name"/> is a valid identifier
+            or a cardinal number.
+            </summary>
+            <param name="name">
+            The <see cref="T:System.String"/> to be checked.
+            </param>
+            <returns>
+            <c>true</c> if the given <paramref name="name"/> is a valid name for
+            a <see cref="T:StaMa.State"/> or <see cref="T:StaMa.Transition"/>.
+            </returns>
+            <remarks>
+            Valid identifiers must start with a letter, digit or underscore.
+            <para>
+            If the identifier starts with a number, the whole identifier must be a
+            cardinal number.
+            </para>
+            <para>
+            If the identifier starts with a letter, any combination of letters,
+            digits or underscores may follow.
+            </para>
+            <para>
+            If the identifier starts with an underscore, the first letter in the
+            string that is not an underscore must be a letter and the rest of the
+            identifier may be any combination of letters, digits or underscores.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateState(StaMa.Region,System.String,StaMa.StateMachineActionCallback,StaMa.StateMachineActionCallback,StaMa.StateMachineDoActionCallback)">
+            <summary>
+            Creates a new state instance.
+            </summary>
+            <param name="parentRegion">
+            The region that contains the state.
+            </param>
+            <param name="name">
+            The name of the <see cref="T:StaMa.State"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="entryAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            enters the the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no entry action is specified.
+            </param>
+            <param name="exitAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when a <see cref="T:StaMa.StateMachine"/>
+            leaves the the <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no exit action is specified.
+            </param>
+            <param name="doAction">
+            The <see cref="T:StaMa.StateMachineDoActionCallback"/> delegate that defines the perpetual action to be executed while the <see cref="T:StaMa.StateMachine"/> is in this <see cref="T:StaMa.State"/>.
+            May be <c>null</c> if no do action is specified.
+            </param>
+            <returns>
+            A <see cref="T:StaMa.State"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateStateCollection">
+            <summary>
+            Creates a new state collection instance.
+            </summary>
+            <returns>
+            A <see cref="T:StaMa.StateCollection"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateRegion(StaMa.State,System.String,System.Int32)">
+            <summary>
+            Creates a new region instance.
+            </summary>
+            <param name="parentState">
+            The state that contains the region.
+            </param>
+            <param name="initialStateName">
+            A <see cref="T:System.String"/> that contains the name of the <see cref="T:StaMa.Region"/>'s initial <see cref="T:StaMa.State"/>.
+            </param>
+            <param name="historyIndex">
+            If the region has a history, the index of the slot where
+            this region stores its history in the <see cref="T:StaMa.StateMachine"/> instance history.
+            If the region has no history, <see cref="F:System.Int32.MaxValue"/>.
+            </param>
+            <returns>
+            A <see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateRegionCollection">
+            <summary>
+            Creates a new region collection instance.
+            </summary>
+            <returns>
+            A <see cref="T:StaMa.RegionCollection"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateTransition(StaMa.State,System.String,System.String[],System.String[],System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Creates a new transition instance.
+            </summary>
+            <param name="parentState">
+            The state that contains the transition.
+            </param>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceStates">
+            A list of names of the transition source states.
+            </param>
+            <param name="targetStates">
+            A list of names of the transition target states.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition or <c>null</c> to indicate an "any" transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <returns>
+            A <see cref="T:StaMa.Transition"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateTransitionCollection">
+            <summary>
+            Creates a new transition collection instance.
+            </summary>
+            <returns>
+            A <see cref="T:StaMa.TransitionCollection"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateStateConfiguration(System.String[])">
+            <summary>
+            Creates a new state configuration instance based on a state machine template.
+            </summary>
+            <param name="stateBaseConfiguration">
+            A list of <see cref="T:System.String"/> that reference <see cref="T:StaMa.State"/> instances within
+            this <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <returns>
+            A <see cref="T:StaMa.StateConfiguration"/> instance.
+            </returns>
+        </member>
+        <member name="M:StaMa.StateMachineTemplate.InternalCreateStateMachine(System.Object)">
+            <summary>
+            Creates a new <see cref="T:StaMa.StateMachine"/> instance based on a <see cref="T:StaMa.StateMachineTemplate"/>.
+            </summary>
+            <param name="context">
+            A <see cref="T:System.Object"/> that may be used to transport additional context information
+            to the <see cref="T:StaMa.StateMachineActionCallback"/>. The given value will be accessible through
+            the <see cref="P:StaMa.StateMachine.Context"/> property.
+            </param>
+            <returns>
+            A <see cref="T:StaMa.StateMachine"/> instance.
+            </returns>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.StateMachineOptions">
+            <summary>
+            Gets the option flags for the state machine.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.Root">
+            <summary>
+            Gets the root <see cref="T:StaMa.Region"/> instance of this <see cref="T:StaMa.StateMachineTemplate"/> instance.
+            </summary>
+            <value>
+            Returns a valid <see cref="T:StaMa.Region"/> instance when the top level opening <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Region(System.String,System.Boolean)"/> statement has been balanced with a
+            <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.EndRegion"/> statement
+            and the substructure is well-formed and valid; otherwise, <c>null</c>.
+            </value>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.StateConfigurationMax">
+            <summary>
+            Gets the length of the state array within a <see cref="T:StaMa.StateConfiguration"/> instance.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.ConcurrencyDegree">
+            <summary>
+            Gets the maximum number of concurrent transitions possible for a single trigger event.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.HistoryMax">
+            <summary>
+            Gets the number of history storage slots necessary within a <see cref="T:StaMa.StateMachine"/> instance.
+            </summary>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.SerializationSignatureGenerator">
+            <summary>
+            Gets or sets a method that calculates a hash signature from a <see cref="T:System.String"/> that uniquely describes the state machine structure.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.SignatureGenerator"/> delegate or <c>null</c> to suppress calculation of a signature when
+            a <see cref="T:StaMa.StateMachine"/> saves its state or resumes from a saved state.
+            </value>
+        </member>
+        <member name="P:StaMa.StateMachineTemplate.Signature">
+            <summary>
+            Gets a hash signature for the state machine structure.
+            </summary>
+            <value>
+            A <see cref="T:System.String"/> as calculated by the <see cref="P:StaMa.StateMachineTemplate.SerializationSignatureGenerator"/>. Returns <see cref="F:System.String.Empty"/> if the <see cref="P:StaMa.StateMachineTemplate.SerializationSignatureGenerator"/> has been set <c>null</c>.
+            </value>
+        </member>
+        <member name="T:StaMa.Transition">
+            <summary>
+            Represents a transition with source state, target state and information when the transition shall be executed.
+            </summary>
+            <remarks>
+            Instances of this class will be created through the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.Transition"/> methods.
+            </remarks>
+        </member>
+        <member name="M:StaMa.Transition.#ctor(StaMa.State,System.String,System.String[],System.String[],System.Object,StaMa.StateMachineGuardCallback,StaMa.StateMachineActionCallback)">
+            <summary>
+            Initializes a new <see cref="T:StaMa.Transition"/> instance.
+            </summary>
+            <param name="parentState">
+            The anchor <see cref="T:StaMa.State"/> where the <see cref="T:StaMa.Transition"/> is aggregated.
+            </param>
+            <param name="name">
+            The name of the <see cref="T:StaMa.Transition"/> to be created. Must be unique within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </param>
+            <param name="sourceStates">
+            A list of names of the transition source states.
+            </param>
+            <param name="targetStates">
+            A list of names of the transition target states.
+            </param>
+            <param name="triggerEvent">
+            A <see cref="T:System.Object"/> that represents the trigger event that will execute the transition.
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </param>
+            <param name="guard">
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate that provides additional conditions
+            for the transition; otherwise, <c>null</c> if no addititional conditions are neccessary.
+            </param>
+            <param name="transitionAction">
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate that will be called when
+            the transition is executed.
+            May be <c>null</c> if no transition action is required.
+            </param>
+            <remarks>
+            Instances of this class will be created through the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="M:StaMa.StateMachineTemplate.Transition(System.String,System.String,System.String,System.Object)"/> method
+            or one of its overloads.
+            </remarks>
+        </member>
+        <member name="M:StaMa.Transition.ToString">
+            <summary>
+            Returns the name of the <see cref="T:StaMa.Transition"/> as specified in the <see cref="T:StaMa.StateMachineTemplate"/>.<see cref="O:StaMa.StateMachineTemplate.Transition"/> statement.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> containing the value of the <see cref="P:StaMa.Transition.Name"/> property of the <see cref="T:StaMa.Transition"/>.
+            </returns>
+        </member>
+        <member name="P:StaMa.Transition.Name">
+            <summary>
+            Gets name of the <see cref="T:StaMa.Transition"/>.
+            </summary>
+            <value>
+            An identifier which is unique within the embedding <see cref="T:StaMa.StateMachineTemplate"/>.
+            </value>
+        </member>
+        <member name="P:StaMa.Transition.Parent">
+            <summary>
+            Gets the anchor <see cref="T:StaMa.State"/> where the <see cref="T:StaMa.Transition"/> is aggregated.
+            </summary>
+            <remarks>
+            Usually the <see cref="P:StaMa.Transition.Parent"/> will be identical with the source <see cref="T:StaMa.State"/>.
+            In some cases a transition may be aggregated on a higher hierarchical level than the 
+            <see cref="P:StaMa.Transition.SourceState"/> in order to raise the <see cref="T:StaMa.Transition"/>s priority above other
+            transitions that are handled premptive due to their hierarchy level.
+            </remarks>
+        </member>
+        <member name="P:StaMa.Transition.SourceState">
+            <summary>
+            Gets the <see cref="T:StaMa.StateConfiguration"/> that represents the
+            source state of the <see cref="T:StaMa.Transition"/>.
+            </summary>
+            <remarks>
+            The <see cref="P:StaMa.Transition.SourceState"/> will only reference a configuration of
+            sub-<see cref="T:StaMa.State"/> instances of the anchor <see cref="P:StaMa.Transition.Parent"/> state.
+            </remarks>
+        </member>
+        <member name="P:StaMa.Transition.TargetState">
+            <summary>
+            Gets the <see cref="T:StaMa.StateConfiguration"/> that represents the
+            target state of the <see cref="T:StaMa.Transition"/>.
+            </summary>
+            <remarks>
+            The <see cref="P:StaMa.Transition.TargetState"/> could reference any configuration of
+            <see cref="T:StaMa.State"/> instances within the <see cref="T:StaMa.StateMachineTemplate"/>.
+            </remarks>
+        </member>
+        <member name="P:StaMa.Transition.TriggerEvent">
+            <summary>
+            Gets the trigger event on which the <see cref="T:StaMa.Transition"/> will react.
+            </summary>
+            <value>
+            A <see cref="T:System.Object"/> instance that represents the trigger event or <c>null</c> for 
+            completion transitions.
+            </value>
+            <remarks>
+            See also <see cref="M:StaMa.StateMachine.SendTriggerEvent(System.Object)"/>.
+            </remarks>
+        </member>
+        <member name="P:StaMa.Transition.Guard">
+            <summary>
+            Gets the callback method that provides additional conditions
+            for the transition.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateMachineGuardCallback"/> delegate of <c>null</c> if no additional
+            conditions are defined.
+            </value>
+        </member>
+        <member name="P:StaMa.Transition.TransitionAction">
+            <summary>
+            Gets the callback method that will be called when the transition is executed.
+            </summary>
+            <value>
+            A <see cref="T:StaMa.StateMachineActionCallback"/> delegate or
+            <c>null</c> if no transition action is defined.
+            </value>
+        </member>
+        <member name="P:StaMa.Transition.LeastCommonAncestor">
+            <summary>
+            Gets the least common ancestor of the <see cref="P:StaMa.Transition.SourceState"/> and
+            the <see cref="P:StaMa.Transition.TargetState"/> of the <see cref="T:StaMa.Transition"/>.
+            </summary>
+            <value>
+            The <see cref="T:StaMa.Region"/> instance 'up' to which the <see cref="T:StaMa.StateMachine"/> has to
+            leave states and enter states during the state change initiated through this <see cref="T:StaMa.Transition"/>.
+            </value>
+        </member>
+    </members>
+</doc>
